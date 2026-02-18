@@ -44,6 +44,17 @@ static int rl_x, rl_y;
 static WINDOW *rl_win;
 
 static bool rl_cancelled;
+static char *rl_prefill;
+
+static int
+rl_prefill_hook(void)
+{
+	if(rl_prefill) {
+		rl_insert_text(rl_prefill);
+		rl_prefill = NULL;
+	}
+	return 0;
+}
 
 static void
 rl_refresh()
@@ -175,8 +186,14 @@ abook_readline(WINDOW *w, int y, int x, char *s, bool use_completion)
 	wmove(rl_win = w, rl_y = y, rl_x = x);
 	rl_refresh();
 
-	if(s && *s)
+	if(s && *s) {
 		add_history(s);
+		rl_prefill = s;
+		rl_startup_hook = rl_prefill_hook;
+	} else {
+		rl_prefill = NULL;
+		rl_startup_hook = NULL;
+	}
 
 	ret = readline(NULL);
 
