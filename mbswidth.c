@@ -62,7 +62,7 @@
 #ifndef HAVE_DECL_WCWIDTH
 #	warn "this configure-time declaration test was not run"
 #endif
-#if !HAVE_DECL_WCWIDTH
+#if !HAVE_DECL_WCWIDTH && !defined(__GLIBC__)
 int wcwidth ();
 #endif
 
