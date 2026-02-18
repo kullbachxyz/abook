@@ -1,13 +1,15 @@
-Reviewers wanted! [Please add a ticket to ask to get added as a reviewer](https://github.com/hhirsch/abook/issues/new)
 # Abook
-A classic adress book for the command line.
+A classic address book for the command line.
 
 Originally created by [JH](jheinonen@users.sourceforge.net).
+This is a fork of [hhirsch/abook](https://github.com/hhirsch/abook) with the following changes:
+
+- **Edit fields in place**: when editing a field, the existing value is pre-loaded so you can correct typos without retyping the whole thing.
+- **Configurable date format**: date fields (birthday, anniversary, etc.) can be displayed in any format via `abookrc`. See [Date Format](#date-format) below.
 
 ## SourceForge Page
 - The original repo can be found at http://abook.sourceforge.net/
 - The original mailing list can be found at https://lists.sourceforge.net/lists/listinfo/abook-devel
-- Lately there is activity on there again which might render this fork obsolete
 
 ## Compilation
 
@@ -43,6 +45,28 @@ See the mutt manual for details.
 
 Abook can also convert from/to mutt alias files and a number of other formats.
 Mutt groups are fully supported.
+
+## Date Format
+
+Date fields (e.g. birthday, anniversary) can be displayed in any format by setting `date_format` in your `~/.abook/abookrc`:
+
+```
+set date_format = "%D.%M.%Y"   # 30.06.1994  (German)
+set date_format = "%D-%M-%Y"   # 30-06-1994
+set date_format = "%Y-%M-%D"   # 1994-06-30  (ISO 8601, default)
+```
+
+| Sequence | Meaning | Example |
+|---|---|---|
+| `%Y` | Year, 4 digits | `1994` |
+| `%y` | Year, no padding | `1994` |
+| `%M` | Month, 2 digits | `06` |
+| `%m` | Month, no padding | `6` |
+| `%D` | Day, 2 digits | `30` |
+| `%d` | Day, no padding | `30` |
+| `%I` | ISO 8601 | `1994-06-30` |
+
+The format applies in both the main list and the detail/edit view.
 
 ## Notes
 
