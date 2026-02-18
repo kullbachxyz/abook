@@ -9,6 +9,7 @@ void		get_first_email(char *str, int item);
 void		roll_emails(int item, enum rotate_dir dir);
 void		add_item();
 int		parse_date_string(char *s, int *day, int *month, int *year);
+void		locale_date(char *str, size_t str_len, int year, int month, int day);
 
 #define EDITW_COLS	(COLS - 6)
 #define EDITW_LINES	(LINES - 5)

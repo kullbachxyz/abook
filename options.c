@@ -91,6 +91,7 @@ static struct option abook_vars[] = {
 	{ "color_field_name_bg", OT_STR, STR_COLOR_FIELD_NAME_BG, UL "default" },
 	{ "color_field_value_fg", OT_STR, STR_COLOR_FIELD_VALUE_FG, UL "green" },
 	{ "color_field_value_bg", OT_STR, STR_COLOR_FIELD_VALUE_BG, UL "default" },
+	{ "date_format", OT_STR, STR_DATE_FORMAT, UL "%Y-%M-%D" },
 	{ NULL }
 };
 

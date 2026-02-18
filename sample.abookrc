@@ -108,6 +108,16 @@ set sort_field=nick
 # show cursor in main display
 set show_cursor=false
 
+# Display format for date fields (birthday, anniversary, etc.)
+# in both the main list and the detail/edit view.
+# Sequences: %Y=year(4-digit), %y=year, %M=month(2-digit), %m=month,
+#            %D=day(2-digit), %d=day, %I=ISO 8601
+# Examples:
+#   set date_format="%D.%M.%Y"   ->  30.06.1994  (German)
+#   set date_format="%D-%M-%Y"   ->  30-06-1994
+#   set date_format="%Y-%M-%D"   ->  1994-06-30  (ISO 8601, default)
+set date_format="%Y-%M-%D"
+
 # colors
 set use_colors = true
 set color_header_fg = red

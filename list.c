@@ -165,6 +165,7 @@ print_list_field(int item, int line, int *x_pos, struct index_elem *e)
 	char *s, *p;
 	int width, x_start, mustfree = FALSE, len = abs(e->d.field.len);
 	struct list_field f;
+	char datebuf[64];
 
 	get_list_field(item, e, &f);
 	s = f.data;
@@ -173,7 +174,15 @@ print_list_field(int item, int line, int *x_pos, struct index_elem *e)
 		*x_pos += len;
 		return;
 	}
-	
+
+	if(f.type == FIELD_DATE) {
+		int day, month, year;
+		if(parse_date_string(s, &day, &month, &year)) {
+			locale_date(datebuf, sizeof(datebuf), year, month, day);
+			s = datebuf;
+		}
+	}
+
 	if(f.type == FIELD_EMAILS && !opt_get_bool(BOOL_SHOW_ALL_EMAILS))
 		if((p = strchr(s, ',')) != NULL) {
 			s = xstrndup(s, p - s);

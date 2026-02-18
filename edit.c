@@ -19,6 +19,7 @@
 #include "list.h"
 #include "edit.h"
 #include "misc.h"
+#include "options.h"
 #include "views.h"
 #include "xmalloc.h"
 #include "color.h"
@@ -29,8 +30,6 @@
 #       include <locale.h>
 #endif 
 
-
-static void locale_date(char *str, size_t str_len, int year, int month, int day);
 
 /*
  * some extern variables
@@ -451,17 +450,12 @@ format_date(char *str, size_t str_len, char *fmt, int year, int month, int day)
  *
  * In the absence of any localization, use an ISO 8601 representation.
  */
-static void
+void
 locale_date(char *str, size_t str_len, int year, int month, int day)
 {
-	char *fmt;
-
-#if defined(HAVE_LOCALE_H) && defined(HAVE_SETLOCALE)
-	fmt = year ?	dcgettext(PACKAGE, "%Y-%M-%D", LC_TIME) :
-			dcgettext(PACKAGE, "--%M-%D", LC_TIME);
-#else
-	fmt = "%I";
-#endif
+	char *fmt = opt_get_str(STR_DATE_FORMAT);
+	if(!fmt || !*fmt)
+		fmt = "%Y-%M-%D";
 	format_date(str, str_len, fmt, year, month, day);
 }
 

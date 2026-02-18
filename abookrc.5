@@ -131,6 +131,38 @@ Defines the command used to start the web browser to view a contact's URL. Defau
 Defines the style of address formatting to be used when exporting as text / printing the database (European, UK, or USA). Default is European ("eu").
 
 .TP
+\fBdate_format\fP=format_string
+Defines the display format for date fields (e.g. birthday, anniversary) in both
+the main list and the detail/edit view. The format string supports the following
+sequences:
+.RS
+.TP
+.B %Y
+Year, zero-padded to 4 digits (e.g. 1994)
+.TP
+.B %y
+Year, no padding
+.TP
+.B %M
+Month, zero-padded to 2 digits (e.g. 06)
+.TP
+.B %m
+Month, no padding
+.TP
+.B %D
+Day, zero-padded to 2 digits (e.g. 30)
+.TP
+.B %d
+Day, no padding
+.TP
+.B %I
+ISO 8601 (YYYY-MM-DD)
+.RE
+.IP
+Examples: \fI"%D.%M.%Y"\fP gives \fI30.06.1994\fP, \fI"%D-%M-%Y"\fP gives \fI30-06-1994\fP.
+Default is \fI"%Y-%M-%D"\fP (ISO 8601).
+
+.TP
 \fBuse_ascii_only\fP=[true|false]
 This option allows you to force Abook use only ASCII characters. This option is useful if your terminal doesn't support non-ASCII characters. Default is false.
 
