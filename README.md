@@ -1,54 +1,70 @@
-# Abook
-A classic address book for the command line.
+# abook
 
-Originally created by [JH](jheinonen@users.sourceforge.net).
-This is a fork of [hhirsch/abook](https://github.com/hhirsch/abook) with the following changes:
+A terminal address book, built on [abook](http://abook.sourceforge.net/) by JH.
 
-- **Edit fields in place**: when editing a field, the existing value is pre-loaded so you can correct typos without retyping the whole thing.
-- **Configurable date format**: date fields (birthday, anniversary, etc.) can be displayed in any format via `abookrc`. See [Date Format](#date-format) below.
+This is a fork of [hhirsch/abook](https://github.com/hhirsch/abook) with the following additions:
 
-## SourceForge Page
-- The original repo can be found at http://abook.sourceforge.net/
-- The original mailing list can be found at https://lists.sourceforge.net/lists/listinfo/abook-devel
+- **Edit fields in place** — the existing value is pre-loaded when editing, so you can fix typos without retyping.
+- **Configurable date format** — display birthday, anniversary, and other date fields in any format via `abookrc`.
 
-## Compilation
-
-To compile abook you must have ncurses development libraries installed.
-Starting from version 0.4.10 abook is known to compile with the native curses
-library of SUN Solaris and OpenBSD. Since version 0.5.0 GNU readline is
-required. Please note that other readline implementations don't work.
-
-If you compile with --enable-debug flag you should redirect standard error
-to somewhere. (for example abook 2> debug or abook 2> /dev/null) Abook has
-been compiled and tested successfully on following platforms:
-(NOTE: All versions of abook haven't been tested on all platforms.)
-
-Linux (distributions with moderately new GNU ncurses and GNU readline libraries
-       should work)
+---
 
 ## Installation
 
-See INSTALL for detailed instructions.
+### Dependencies
 
-If you want to use abook with mutt you should add following lines to your
-~/.muttrc or to the systemwide /etc/Muttrc file.
+| Package | Notes |
+|---|---|
+| `ncurses` | `libncursesw5-dev` / `ncurses-devel` |
+| `readline` | GNU readline with history support (`libreadline-dev` / `readline-devel`) |
 
-set query_command="abook --mutt-query '%s'"
-macro pager A |'abook --add-email'\n
+**Debian / Ubuntu:**
+```sh
+sudo apt install build-essential libncursesw5-dev libreadline-dev
+```
 
-After this you can make queries from mutt using the query command ('Q')
-and add sender e-mail addresses to the addressbook from pager using 'A'
-command. (Of course you can choose another keybinding if you like.)
+**Arch Linux:**
+```sh
+sudo pacman -S base-devel ncurses readline
+```
 
-It's also recommended to set pipe_decode variable in mutt configuration.
-See the mutt manual for details.
+**Fedora / RHEL:**
+```sh
+sudo dnf install gcc make ncurses-devel readline-devel
+```
 
-Abook can also convert from/to mutt alias files and a number of other formats.
-Mutt groups are fully supported.
+**macOS (Homebrew):**
+```sh
+brew install ncurses readline
+```
 
-## Date Format
+### Build from source
 
-Date fields (e.g. birthday, anniversary) can be displayed in any format by setting `date_format` in your `~/.abook/abookrc`:
+```sh
+git clone https://github.com/kullbachxyz/abook
+cd abook
+make
+sudo make install
+```
+
+To install to a custom prefix (e.g. `~/.local`), edit `config.mk` before building:
+
+```
+PREFIX = $(HOME)/.local
+```
+
+Then `make && make install` (no `sudo` needed for a user prefix).
+
+---
+
+## Configuration
+
+Abook reads `~/.abook/abookrc` on startup. A sample config is installed to
+`/usr/local/etc/abook/abookrc` (or see `sample.abookrc` in this repo).
+
+### Date format
+
+Date fields (birthday, anniversary, etc.) can be displayed in any format:
 
 ```
 set date_format = "%D.%M.%Y"   # 30.06.1994  (German)
@@ -66,18 +82,41 @@ set date_format = "%Y-%M-%D"   # 1994-06-30  (ISO 8601, default)
 | `%d` | Day, no padding | `30` |
 | `%I` | ISO 8601 | `1994-06-30` |
 
-The format applies in both the main list and the detail/edit view.
+The format applies in both the list view and the detail/edit view.
+
+---
+
+## Mutt integration
+
+Add to `~/.muttrc` (or the system-wide `/etc/Muttrc`):
+
+```
+set query_command = "abook --mutt-query '%s'"
+macro pager A |'abook --add-email'\n
+```
+
+- Press `Q` in mutt to query the address book.
+- Press `A` in the pager to add a sender's address directly.
+
+It is also recommended to set `pipe_decode` in your mutt config — see the mutt manual for details.
+
+Abook supports importing and exporting mutt alias files and a number of other formats. Mutt groups are fully supported.
+
+---
 
 ## Notes
 
-If your language specific characters don't work correctly make sure
-that your locale configuration has been done properly. (On Linux you
-must set at least LC_CTYPE environment variable)
+- **Locale / non-ASCII characters** — if special characters appear broken, make sure your locale is configured correctly. On Linux, `LC_CTYPE` must be set to a UTF-8 locale.
+- **Debug mode** — build with `./configure --enable-debug` and redirect stderr: `abook 2>debug.log`.
+- **LDIF import into Netscape** — files exported by abook must use the `.4ld` extension.
 
-If you want to import a ldif file generated by abook in Netscape you
-must use the extension ``.4ld''.
+---
+
+## Links
+
+- Original upstream: http://abook.sourceforge.net/
+- Original mailing list: https://lists.sourceforge.net/lists/listinfo/abook-devel
 
 ## License
 
-All files in this distribution are released under GNU GENERAL PUBLIC LICENSE.
-See COPYING for details.
+Released under the GNU General Public License. See [COPYING](COPYING) for details.

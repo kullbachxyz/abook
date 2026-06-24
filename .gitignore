@@ -1,18 +1,21 @@
-.deps
-autom4te.cache
-Makefile
+# build output
+*.o
+abook
+
+# editor backups
+*~
+
+# autoconf / automake artifacts (not used anymore)
+.deps/
+autom4te.cache/
 abook.spec
-config.h
 config.log
 config.status
 config.cache
+stamp-h1
 intl/Makefile
 po/Makefile
 po/Makefile.in
 po/POTFILES
 po/*.gmo
 po/stamp-po
-stamp-h1
-*.o
-*~
-abook
