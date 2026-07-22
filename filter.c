@@ -65,6 +65,7 @@ static int	csv_export_database(FILE *out, struct db_enumerator e);
 static int	allcsv_export_database(FILE *out, struct db_enumerator e);
 static int	palm_export_database(FILE *out, struct db_enumerator e);
 static int	vcard_export_database(FILE *out, struct db_enumerator e);
+static int	mudita_export_database(FILE *out, struct db_enumerator e);
 static int	mutt_alias_export(FILE *out, struct db_enumerator e);
 static int	mutt_query_export_database(FILE *out, struct db_enumerator e);
 static int	elm_alias_export(FILE *out, struct db_enumerator e);
@@ -102,6 +103,7 @@ struct abook_output_filter e_filters[] = {
 	{ "abook", N_("abook native format"), write_database },
 	{ "ldif", N_("ldif / Netscape addressbook (.4ld)"), ldif_export_database },
 	{ "vcard", N_("vCard 2 file"), vcard_export_database },
+	{ "mudita", N_("vCard 3 file (Mudita phones)"), mudita_export_database },
 	{ "mutt", N_("mutt alias"), mutt_alias_export },
 	{ "muttq", N_("mutt query format (internal use)"), mutt_query_export_database },
 	{ "html", N_("html document"), html_export_database },
@@ -2121,6 +2123,102 @@ vcard_export_item(FILE *out, int item)
 	fprintf(out, "END:VCARD\r\n\r\n");
 
 }
+
+/*
+ * mudita vCard 3.0 export filter
+ *
+ * Mudita phones (e.g. Kompakt, via Mudita Center) only import vCards whose
+ * VERSION is exactly 2.1, 3.0 or 4.0; a missing VERSION line makes the import
+ * silently fail with "no contacts to import". Their parser also reads the name
+ * from the structured N property (not FN) and only recognises the TYPE=
+ * parameter form, mapping phone types home/work/mobile and everything else to
+ * "other". This filter emits vCard 3.0 tailored to that parser.
+ */
+
+static void
+mudita_export_item(FILE *out, int item)
+{
+	int j, email_no;
+	char *name, *tmp;
+	abook_list *emails, *em;
+
+	fprintf(out, "BEGIN:VCARD\r\nVERSION:3.0\r\n");
+
+	fprintf(out, "FN:%s\r\n", safe_str(db_name_get(item)));
+
+	/* N: family;given;additional;prefix;suffix -- split the display name
+	   into surname (last word) and the remaining given names */
+	name = get_surname(db_name_get(item));
+	for( j = strlen(db_name_get(item)) - 1; j >= 0; j-- ) {
+	  if((db_name_get(item))[j] == ' ')
+	    break;
+	}
+	fprintf(out, "N:%s;%.*s;;;\r\n",
+		safe_str(name),
+		j,
+		safe_str(db_name_get(item))
+		);
+	free(name);
+
+	if(db_fget(item, NICK))
+	  fprintf(out, "NICKNAME:%s\r\n",
+		  safe_str(db_fget(item, NICK)));
+	if(db_fget(item, ANNIVERSARY))
+	  fprintf(out, "BDAY:%s\r\n",
+		  safe_str(db_fget(item, ANNIVERSARY)));
+
+	/* ADR (Mudita order): pobox;street;ext;locality;region;code;country */
+	if(db_fget(item, ADDRESS)) {
+		fprintf(out, "ADR;TYPE=HOME:;%s;%s;%s;%s;%s;%s\r\n",
+			safe_str(db_fget(item, ADDRESS)),  // street
+			safe_str(db_fget(item, ADDRESS2)), // ext (n°, ...)
+			safe_str(db_fget(item, CITY)),     // locality
+			safe_str(db_fget(item, STATE)),    // region
+			safe_str(db_fget(item, ZIP)),      // postal code
+			safe_str(db_fget(item, COUNTRY))   // country
+			);
+	}
+
+	if(db_fget(item, PHONE))
+	  fprintf(out, "TEL;TYPE=HOME:%s\r\n", db_fget(item, PHONE));
+	if(db_fget(item, WORKPHONE))
+	  fprintf(out, "TEL;TYPE=WORK:%s\r\n", db_fget(item, WORKPHONE));
+	if(db_fget(item, FAX))
+	  fprintf(out, "TEL;TYPE=FAX:%s\r\n", db_fget(item, FAX));
+	if(db_fget(item, MOBILEPHONE))
+	  /* Mudita maps "mobile" (not the standard "cell") to its mobile type */
+	  fprintf(out, "TEL;TYPE=MOBILE:%s\r\n", db_fget(item, MOBILEPHONE));
+
+	tmp = db_email_get(item);
+	if(*tmp) {
+	  emails = csv_to_abook_list(tmp);
+	  fprintf(out, "EMAIL;TYPE=PREF:%s\r\n", emails->data);
+	  email_no = 1;
+	  for(em = emails->next; em; em = em->next, email_no++ )
+		  fprintf(out, "EMAIL:%s\r\n", em->data);
+
+	  abook_list_free(&emails);
+	}
+	free(tmp);
+
+	if(db_fget(item, NOTES))
+	  fprintf(out, "NOTE:%s\r\n", db_fget(item, NOTES));
+	if(db_fget(item, URL))
+	  fprintf(out, "URL:%s\r\n", db_fget(item, URL));
+
+	fprintf(out, "END:VCARD\r\n\r\n");
+}
+
+static int
+mudita_export_database(FILE *out, struct db_enumerator e)
+{
+  db_enumerate_items(e)
+    mudita_export_item(out, e.item);
+  return 0;
+}
+/*
+ * end of mudita vCard 3.0 export filter
+ */
 
 /*
  * end of vCard export filter

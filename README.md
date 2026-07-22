@@ -6,6 +6,7 @@ This is a fork of [hhirsch/abook](https://github.com/hhirsch/abook) with the fol
 
 - **Edit fields in place** — the existing value is pre-loaded when editing, so you can fix typos without retyping.
 - **Configurable date format** — display birthday, anniversary, and other date fields in any format via `abookrc`.
+- **Mudita export** — a `mudita` export filter producing vCard 3.0 that Mudita Center / Mudita phones (Kompakt etc.) will actually import.
 
 ---
 
@@ -83,6 +84,26 @@ set date_format = "%Y-%M-%D"   # 1994-06-30  (ISO 8601, default)
 | `%I` | ISO 8601 | `1994-06-30` |
 
 The format applies in both the list view and the detail/edit view.
+
+---
+
+## Mudita export
+
+Mudita phones import contacts through Mudita Center, but abook's default `vcard`
+export is silently rejected ("no contacts to import"): Mudita's parser requires
+a `VERSION:` line (which abook's vCard 2 output omits) and only reads the name
+from the structured `N` property using `TYPE=` parameters. The `mudita` filter
+emits vCard 3.0 shaped to that parser.
+
+From the export menu (`e`) choose **vCard 3 file (Mudita phones)**, or from the
+command line:
+
+```sh
+abook --convert --infile ~/.abook/addressbook --outformat mudita --outfile contacts.vcf
+```
+
+Then in Mudita Center: *Your Kompakt → Contacts → Import contacts → Import from file*
+and select `contacts.vcf`.
 
 ---
 
